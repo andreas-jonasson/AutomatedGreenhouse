@@ -6,54 +6,79 @@
     <groupId>se.drutt</groupId>
     <artifactId>automated_greenhouse</artifactId>
     <version>0.1</version>
+    <name>Automated Greenhouse</name>
+    <url>https://github.com/andreas-jonasson/AutomatedGreenhouse</url>
 
     <properties>
+        <!-- PROJECT ENCODING PROPERTIES -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <main.class>se.drutt.SHT30</main.class>
+
         <junit.version>5.9.0</junit.version>
         <gson.version>2.10</gson.version>
         <slf4j.version>2.0.3</slf4j.version>
         <pi4j.version>2.2.1</pi4j.version>
+        <!-- JAVA COMPILER VERSIONS -->
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <!-- BUILD PLUGIN VERSIONS -->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.1.0</maven-jar-plugin.version>
+        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
     </properties>
 
     <build>
-        <plugins>
-            <!-- Automated tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.0</version>
-            </plugin>
+        <finalName>automated_greenhouse-0.1</finalName>
 
+        <plugins>
+            <!--
+            https://maven.apache.org/plugins/maven-compiler-plugin/
+            The Compiler Plugin is used to compile the sources of your project.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <release>${java.version}</release>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <verbose>false</verbose>
                 </configuration>
             </plugin>
 
+            <!--
+            https://maven.apache.org/plugins/maven-jar-plugin/
+            This plugin provides the capability to build (executable) jars and is used here to set the mainClass
+            which will start the application.
+            -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
                 <configuration>
-                    <mainClass>SHT30</mainClass>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
                 </configuration>
             </plugin>
 
+            <!--
+            https://maven.apache.org/plugins/maven-shade-plugin/
+            This plugin provides the capability to package the artifact in an uber-jar, including its dependencies and
+            to shade - i.e. rename - the packages of some of the dependencies. The transformer will combine the files
+            in the META-INF.services directories of multiple Pi4J plugins with the same package name into one file.
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>${maven-shade-plugin.version}</version>
                 <configuration>
-                    <minimizeJar>false</minimizeJar>
-
                     <transformers>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>SHT30</mainClass>
-                        </transformer>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                     </transformers>
                 </configuration>
                 <executions>
@@ -68,8 +93,8 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <!-- Google GSON -->
+<dependencies>
+<!-- Google GSON -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -84,33 +109,34 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Raspberry Pi -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <!-- Pi4J (Platforms and I/O Providers) -->
+        <!-- Pi4J Core -->
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-core</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+
+        <!-- Pi4J Raspberry Pi Platform -->
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-plugin-raspberrypi</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+
+        <!-- Pi4J Raspberry Pi GPIO -->
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-plugin-pigpio</artifactId>
             <version>${pi4j.version}</version>
         </dependency>
+
+        <!-- Pi4J Mock Platform -->
+        <dependency>
+            <groupId>com.pi4j</groupId>
+            <artifactId>pi4j-plugin-mock</artifactId>
+            <version>${pi4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
