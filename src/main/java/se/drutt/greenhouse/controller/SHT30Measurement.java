@@ -1,4 +1,4 @@
-package se.drutt;
+package se.drutt.greenhouse.controller;
 
 import java.text.DecimalFormat;
 

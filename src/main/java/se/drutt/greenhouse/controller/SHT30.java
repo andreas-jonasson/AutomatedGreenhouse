@@ -1,4 +1,4 @@
-package se.drutt;
+package se.drutt.greenhouse.controller;
 
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
